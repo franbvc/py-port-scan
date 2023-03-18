@@ -58,7 +58,7 @@ class TCPScanner:
                         f"[-] {target_host} : {target_port} ({WELL_KNOWN_PORTS[str(target_port)]})"
                     )
                 else:
-                    print(f"[-] {target_host}:{target_port}")
+                    print(f"[-] {target_host} : {target_port}")
 
     def scan_ports(
         self, only_show_open: bool = True, show_port_known_service: bool = True
