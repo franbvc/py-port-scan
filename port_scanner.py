@@ -20,7 +20,7 @@ from utils import expand_ips, expand_ports
     "--timeout",
     prompt="Timeout (empty to standard)",
     help="The timeout to scan.",
-    default="1",
+    default="0.2",
 )
 @click.option(
     "--only_show_open", prompt="Only show open (y/n)", help="Only show open ports."
@@ -31,8 +31,8 @@ from utils import expand_ips, expand_ports
     help="Show port known service.",
 )
 def hello(host_list, port_list, timeout, only_show_open, show_port_known_service):
-    scanner = TCPScanner(expand_ips(host_list), expand_ports(port_list), timeout)
-    scanner.scan_ports(only_show_open, show_port_known_service)
+    scanner = TCPScanner(expand_ips(host_list), expand_ports(port_list), float(timeout))
+    scanner.scan_ports(only_show_open == "y", show_port_known_service="y")
 
 
 if __name__ == "__main__":

@@ -9,10 +9,10 @@ class TCPScanner:
     target_hosts: list[str] = []
     target_ports: list[int] = []
     open_ports: dict[str, list[int]] = {}
-    timeout: float = 1
+    timeout: float = 0.2
 
     def __init__(
-        self, target_hosts: list[str], target_ports: list[int], timeout: float = 1
+        self, target_hosts: list[str], target_ports: list[int], timeout: float = 0.2
     ):
         self.target_hosts = target_hosts
         self.target_ports = target_ports
@@ -30,19 +30,19 @@ class TCPScanner:
         """Attempts to connect to a given port on a given host."""
         try:
             client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            print("socket created")
-            client_socket.settimeout(self.timeout)
+            client_socket.settimeout(float(self.timeout))
             client_socket.connect((target_host, target_port))
 
-            print("connected to port")
-
-            if show_port_known_service:
+            if (
+                show_port_known_service
+                and WELL_KNOWN_PORTS.get(str(target_port)) is not None
+            ):
                 print(
-                    f"[+] {target_host}:{target_port} ({WELL_KNOWN_PORTS[str(target_port)]})"
+                    f"[+] {target_host} : {target_port} ({WELL_KNOWN_PORTS[str(target_port)]})"
                 )
 
-            if not only_show_open:
-                print(f"[+] {target_host}:{target_port}")
+            else:
+                print(f"[+] {target_host} : {target_port}")
 
             self.open_ports[target_host].append(target_port)
 
@@ -50,11 +50,14 @@ class TCPScanner:
 
         except:
             if not only_show_open:
-                if show_port_known_service:
+                if (
+                    show_port_known_service
+                    and WELL_KNOWN_PORTS.get(str(target_port)) is not None
+                ):
                     print(
-                        f"[-] {target_host}:{target_port} ({WELL_KNOWN_PORTS[str(target_port)]})"
+                        f"[-] {target_host} : {target_port} ({WELL_KNOWN_PORTS[str(target_port)]})"
                     )
-                if not show_port_known_service:
+                else:
                     print(f"[-] {target_host}:{target_port}")
 
     def scan_ports(
@@ -62,5 +65,4 @@ class TCPScanner:
     ):
         for host in self.target_hosts:
             for port in self.target_ports:
-                print(f"Scanning {host}:{port}...")
                 self.scan_port(host, port, only_show_open, show_port_known_service)
